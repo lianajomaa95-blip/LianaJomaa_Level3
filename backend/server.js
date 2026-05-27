@@ -8,6 +8,8 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/ingredients', require('./routes/ingredientRoutes'));
+app.use('/api/orders', require('./routes/orderRoutes'));
 app.get('/', (req, res) => {
 res.json({ message: 'Pizza Delivery API is running 🍕' });
 });

@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-// Protected Route component - redirects to login if not authenticated
+import PizzaBuilder from './pages/PizzaBuilder';
 function ProtectedRoute({ children }) {
 const { isAuthenticated } = useSelector((state) => state.auth);
 return isAuthenticated ? children : <Navigate to="/login" />;
@@ -20,6 +20,14 @@ path="/dashboard"
 element={
 <ProtectedRoute>
 <Dashboard />
+</ProtectedRoute>
+}
+/>
+<Route
+path="/build-pizza"
+element={
+<ProtectedRoute>
+<PizzaBuilder />
 </ProtectedRoute>
 }
 />

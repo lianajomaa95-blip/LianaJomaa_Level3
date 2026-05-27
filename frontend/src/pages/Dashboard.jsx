@@ -29,22 +29,37 @@ Logout
 </div>
 </nav>
 <main className="max-w-4xl mx-auto p-6">
-    <div className="bg-white rounded-2xl shadow-xl p-10 text-center">
-      <h2 className="text-4xl font-bold text-gray-800 mb-4">Welcome, {user?.name}! 👋</h2>
-      <p className="text-gray-600 mb-6">
-        {user?.isVerified
-          ? "Your account is verified. You're all set to order pizza!"
-          : "📧 Please check your email and verify your account to start ordering."}
-      </p>
-      <div className="bg-gray-50 rounded-lg p-6 text-left">
+    <div className="bg-white rounded-2xl shadow-xl p-10">
+      <div className="text-center mb-8">
+        <h2 className="text-4xl font-bold text-gray-800 mb-2">
+          Welcome, {user?.name}! 👋
+        </h2>
+        <p className="text-gray-600">
+          {user?.isVerified
+            ? "Your account is verified. Ready to order?"
+            : '📧 Check your email to verify your account.'}
+        </p>
+      </div>
+
+      <button
+        onClick={() => navigate('/build-pizza')}
+        className="w-full bg-linear-to-r from-orange-500 to-red-500 text-white font-bold py-5 rounded-xl hover:from-orange-600 hover:to-red-600 transition text-xl shadow-lg mb-6"
+      >
+        🍕 Build Your Custom Pizza
+      </button>
+
+      <div className="bg-gray-50 rounded-lg p-6">
         <h3 className="font-semibold text-gray-800 mb-3">Account Info</h3>
-        <p className="text-gray-600"><strong>Email:</strong> {user?.email}</p>
-        <p className="text-gray-600"><strong>Role:</strong> {user?.role}</p>
+        <p className="text-gray-600">
+          <strong>Email:</strong> {user?.email}
+        </p>
+        <p className="text-gray-600">
+          <strong>Role:</strong> {user?.role}
+        </p>
         <p className="text-gray-600">
           <strong>Verified:</strong> {user?.isVerified ? '✅ Yes' : '❌ Not yet'}
         </p>
       </div>
-      <p className="text-gray-400 mt-8 text-sm">🚧 Pizza builder coming on Day 5!</p>
     </div>
   </main>
 </div>

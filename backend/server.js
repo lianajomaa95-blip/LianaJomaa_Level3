@@ -1,27 +1,17 @@
-// Load environment variables FIRST (before anything else uses them)
+// Load environment variables FIRST
 require('dotenv').config();
-
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
-
-// Initialize the app
 const app = express();
-
-// Connect to MongoDB
 connectDB();
-
-// Middleware — runs on every request
-app.use(cors());                          // allow frontend to talk to backend
-app.use(express.json());                  // parse JSON request bodies
-
-// Test route — just to confirm the server works
+app.use(cors());
+app.use(express.json());
+app.use('/api/auth', require('./routes/authRoutes'));
 app.get('/', (req, res) => {
-  res.json({ message: 'Pizza Delivery API is running 🍕' });
+res.json({ message: 'Pizza Delivery API is running 🍕' });
 });
-
-// Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
+console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });

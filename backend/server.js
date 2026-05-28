@@ -10,6 +10,7 @@ app.use(express.json());
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/ingredients', require('./routes/ingredientRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 app.get('/', (req, res) => {
 res.json({ message: 'Pizza Delivery API is running 🍕' });
 });

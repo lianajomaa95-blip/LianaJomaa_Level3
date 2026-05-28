@@ -123,8 +123,39 @@ message: 'Server error',
 });
 }
 };
+// @desc    Update order payment status (after mock payment)
+// @route   PUT /api/orders/:id/confirm-payment
+// @access  Protected
+const confirmPayment = async (req, res) => {
+try {
+const { paymentId } = req.body;
+const order = await Order.findById(req.params.id);
+if (!order) {
+  return res.status(404).json({ success: false, message: 'Order not found' });
+}
+
+// Ensure only the owner can confirm their own payment
+if (order.user.toString() !== req.user._id.toString()) {
+  return res.status(403).json({ success: false, message: 'Not authorized' });
+}
+
+order.paymentId = paymentId || `mock_pay_${Date.now()}`;
+order.paymentStatus = 'Paid';
+await order.save();
+
+res.status(200).json({
+  success: true,
+  message: 'Payment confirmed successfully',
+  data: order,
+});
+} catch (error) {
+console.error('Confirm payment error:', error);
+res.status(500).json({ success: false, message: 'Server error' });
+}
+};
 module.exports = {
-createOrder,
-getMyOrders,
-getOrderById,
+  createOrder,
+  getMyOrders,
+  getOrderById,
+    confirmPayment,
 };

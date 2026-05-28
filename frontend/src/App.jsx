@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import PizzaBuilder from './pages/PizzaBuilder';
+import MyOrders from './pages/MyOrders';
 function ProtectedRoute({ children }) {
 const { isAuthenticated } = useSelector((state) => state.auth);
 return isAuthenticated ? children : <Navigate to="/login" />;
@@ -15,22 +16,9 @@ return (
 <Route path="/" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} />} />
 <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
 <Route path="/register" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Register />} />
-<Route
-path="/dashboard"
-element={
-<ProtectedRoute>
-<Dashboard />
-</ProtectedRoute>
-}
-/>
-<Route
-path="/build-pizza"
-element={
-<ProtectedRoute>
-<PizzaBuilder />
-</ProtectedRoute>
-}
-/>
+<Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+<Route path="/build-pizza" element={<ProtectedRoute><PizzaBuilder /></ProtectedRoute>} />
+<Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
 </Routes>
 );
 }

@@ -47,6 +47,12 @@ Logout
       >
         🍕 Build Your Custom Pizza
       </button>
+      <button
+        onClick={() => navigate('/my-orders')}
+        className="w-full bg-white border-2 border-orange-500 text-orange-600 font-bold py-4 rounded-xl hover:bg-orange-50 transition text-lg mb-6"
+      >
+        📦 View My Orders
+      </button>
 
       <div className="bg-gray-50 rounded-lg p-6">
         <h3 className="font-semibold text-gray-800 mb-3">Account Info</h3>

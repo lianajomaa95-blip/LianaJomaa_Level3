@@ -5,10 +5,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../store/authSlice';
 import api from '../utils/api';
 import PizzaPreview from '../components/PizzaPreview';
+import PaymentModal from '../components/PaymentModal';
 function PizzaBuilder() {
 const [ingredients, setIngredients] = useState({});
 const [loading, setLoading] = useState(true);
 const [currentStep, setCurrentStep] = useState(1);
+const [showPayment, setShowPayment] = useState(false);
 const navigate = useNavigate();
 const dispatch = useDispatch();
 const { user } = useSelector((state) => state.auth);
@@ -73,35 +75,42 @@ return;
 setCurrentStep(currentStep + 1);
 };
 const prevStep = () => setCurrentStep(currentStep - 1);
-const handlePlaceOrder = async () => {
+const handlePlaceOrder = () => {
 if (!pizza.base || !pizza.sauce || !pizza.cheese) {
 toast.error('Please complete your pizza first');
 return;
 }
+setShowPayment(true);
+};
+const handlePaymentSuccess = async (paymentId) => {
 try {
-  const orderData = {
-    pizza: {
-      base: { id: pizza.base._id, name: pizza.base.name, price: pizza.base.price },
-      sauce: { id: pizza.sauce._id, name: pizza.sauce.name, price: pizza.sauce.price },
-      cheese: { id: pizza.cheese._id, name: pizza.cheese.name, price: pizza.cheese.price },
-      veggies: pizza.veggies.map((v) => ({ id: v._id, name: v.name, price: v.price })),
-      meats: pizza.meats.map((m) => ({ id: m._id, name: m.name, price: m.price })),
-    },
-    totalPrice: parseFloat(calculateTotal()),
-    paymentStatus: 'Pending',
-  };
-
-  const { data } = await api.post('/orders', orderData);
+const orderData = {
+pizza: {
+base: { id: pizza.base._id, name: pizza.base.name, price: pizza.base.price },
+sauce: { id: pizza.sauce._id, name: pizza.sauce.name, price: pizza.sauce.price },
+cheese: { id: pizza.cheese._id, name: pizza.cheese.name, price: pizza.cheese.price },
+veggies: pizza.veggies.map((v) => ({ id: v._id, name: v.name, price: v.price })),
+meats: pizza.meats.map((m) => ({ id: m._id, name: m.name, price: m.price })),
+},
+totalPrice: parseFloat(calculateTotal()),
+paymentId: paymentId,
+paymentStatus: 'Paid',
+};
+const { data } = await api.post('/orders', orderData);
 
   if (data.success) {
+    setShowPayment(false);
     toast.success('Order placed successfully! 🍕');
     setTimeout(() => navigate('/dashboard'), 1500);
   }
 } catch (error) {
   const message = error.response?.data?.message || 'Failed to place order';
   toast.error(message);
+  setShowPayment(false);
 }
 };
+
+
 const handleLogout = () => {
 dispatch(logout());
 toast.success('Logged out');
@@ -281,6 +290,15 @@ Logout
       </div>
     </div>
   </main>
+
+  {/* PAYMENT MODAL */}
+  {showPayment && (
+    <PaymentModal
+      amount={calculateTotal()}
+      onSuccess={handlePaymentSuccess}
+      onClose={() => setShowPayment(false)}
+    />
+  )}
 </div>
 );
 }

@@ -67,16 +67,21 @@ try {
 const { status } = req.body;
 const validStatuses = ['Order Received', 'In the Kitchen', 'Sent to Delivery', 'Delivered'];
 if (!validStatuses.includes(status)) {
-  return res.status(400).json({ success: false, message: 'Invalid status' });
+return res.status(400).json({ success: false, message: 'Invalid status' });
 }
-
 const order = await Order.findById(req.params.id);
 if (!order) {
-  return res.status(404).json({ success: false, message: 'Order not found' });
+return res.status(404).json({ success: false, message: 'Order not found' });
 }
-
 order.status = status;
 await order.save();
+// REAL-TIME: notify the user who owns this order
+const io = req.app.get('io');
+io.to(order.user.toString()).emit('orderStatusUpdate', {
+  orderId: order._id.toString(),
+  status: status,
+  message: `Your order #${order._id.toString().slice(-8).toUpperCase()} is now "${status}"`,
+});
 
 res.status(200).json({
   success: true,
@@ -88,6 +93,9 @@ console.error('Update order status error:', error);
 res.status(500).json({ success: false, message: 'Server error' });
 }
 };
+
+
+
 // @desc    Get all ingredients (admin inventory view)
 // @route   GET /api/admin/inventory
 // @access  Admin only

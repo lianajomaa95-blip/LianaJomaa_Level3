@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
 import { logout } from '../store/authSlice';
 import api from '../utils/api';
+import socket from '../utils/socket';
 function MyOrders() {
 const [orders, setOrders] = useState([]);
 const [loading, setLoading] = useState(true);
@@ -22,7 +23,28 @@ setLoading(false);
 }
 };
 fetchOrders();
-}, []);
+// REAL-TIME: connect socket and listen for status updates
+if (user?._id) {
+  socket.connect();
+  socket.emit('join', user._id);
+
+  socket.on('orderStatusUpdate', (data) => {
+    toast.success(data.message, { duration: 4000, icon: '🔔' });
+    // Update the specific order's status live
+    setOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order._id === data.orderId ? { ...order, status: data.status } : order
+      )
+    );
+  });
+}
+
+// Cleanup when leaving the page
+return () => {
+  socket.off('orderStatusUpdate');
+  socket.disconnect();
+};
+}, [user?._id]);
 const handleLogout = () => {
 dispatch(logout());
 navigate('/login');

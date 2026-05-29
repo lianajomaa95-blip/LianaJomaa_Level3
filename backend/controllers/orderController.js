@@ -1,5 +1,8 @@
 const Order = require('../models/Order');
 const Ingredient = require('../models/Ingredient');
+const User = require('../models/User');
+const sendEmail = require('../utils/sendEmail');
+const { getLowStockEmail } = require('../utils/emailTemplates');
 // @desc    Create a new pizza order (deducts stock automatically)
 // @route   POST /api/orders
 // @access  Protected (logged-in users only)
@@ -57,7 +60,28 @@ await Ingredient.updateMany(
   { _id: { $in: ingredientIds } },
   { $inc: { stock: -1 } }
 );
-
+    // 6. Check for low stock and alert admin if needed
+    try {
+      const lowStockItems = await Ingredient.find({
+        _id: { $in: ingredientIds },
+        $expr: { $lte: ['$stock', '$threshold'] },
+      });
+      if (lowStockItems.length > 0) {
+    // Find an admin to email
+    const admin = await User.findOne({ role: 'admin' });
+    if (admin) {
+      await sendEmail({
+        to: admin.email,
+        subject: '⚠️ Low Stock Alert - Pizza Delivery',
+        html: getLowStockEmail(lowStockItems),
+      });
+      console.log(`Low stock alert sent to admin for ${lowStockItems.length} items`);
+    }
+  }
+} catch (alertError) {
+  console.error('Low stock alert failed:', alertError.message);
+  // Don't fail the order if the alert email fails
+}
 res.status(201).json({
   success: true,
   message: 'Order placed successfully!',

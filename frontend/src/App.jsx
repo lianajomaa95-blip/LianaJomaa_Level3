@@ -12,12 +12,13 @@ const { isAuthenticated } = useSelector((state) => state.auth);
 return isAuthenticated ? children : <Navigate to="/login" />;
 }
 function App() {
-const { isAuthenticated } = useSelector((state) => state.auth);
+const { isAuthenticated, user } = useSelector((state) => state.auth);
+const home = isAuthenticated ? (user?.role === 'admin' ? '/admin' : '/dashboard') : '/login';
 return (
 <Routes>
-<Route path="/" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} />} />
-<Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
-<Route path="/register" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Register />} />
+<Route path="/" element={<Navigate to={home} />} />
+<Route path="/login" element={isAuthenticated ? <Navigate to={home} /> : <Login />} />
+<Route path="/register" element={isAuthenticated ? <Navigate to={home} /> : <Register />} />
 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 <Route path="/build-pizza" element={<ProtectedRoute><PizzaBuilder /></ProtectedRoute>} />
 <Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
